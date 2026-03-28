@@ -16,7 +16,7 @@ struct customer
 {
     int id;
     char name[50];
-    char phone[20];
+    char phone[15];
 };
 
 // Rental Information
@@ -35,7 +35,7 @@ struct payment
     int id;
     int rental_id;
     int amount;
-    char status[20];  // paid / due
+    char status[20];  
 };
 
 #endif

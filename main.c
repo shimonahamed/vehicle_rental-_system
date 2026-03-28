@@ -1,8 +1,9 @@
+//===== Vehicle Rental System in C=====
+
 #include <stdio.h>
 #include <string.h>
 #include "models.h"
 
-// array and counters
 struct vehicle vehicles[100];
 int vehicle_count = 0;
 
@@ -12,7 +13,6 @@ int customer_count = 0;
 struct rental rentals[100];
 int rental_count = 0;
 
-// Add Vehicle
 void add_vehicle() {
     struct vehicle v;
 
@@ -33,7 +33,6 @@ void add_vehicle() {
     printf("Vehicle added successfully!\n");
 }
 
-// Show Vehicles
 void show_vehicles() {
     if (vehicle_count == 0) {
         printf("No vehicles available!\n");
@@ -51,7 +50,6 @@ void show_vehicles() {
     }
 }
 
-// Add Customer
 void add_customer() {
     struct customer c;
 
@@ -68,7 +66,6 @@ void add_customer() {
     printf("Customer added successfully!\n");
 }
 
-// Find Vehicle Index by ID
 int find_vehicle(int id) {
     for (int i = 0; i < vehicle_count; i++) {
         if (vehicles[i].id == id)
@@ -77,7 +74,7 @@ int find_vehicle(int id) {
     return -1;
 }
 
-// Find Customer Index by ID
+
 int find_customer(int id) {
     for (int i = 0; i < customer_count; i++) {
         if (customers[i].id == id)
@@ -86,7 +83,7 @@ int find_customer(int id) {
     return -1;
 }
 
-// Create Rental
+
 void create_rental() {
     struct rental r;
     int v_index, c_index;
@@ -124,13 +121,12 @@ void create_rental() {
     rentals[rental_count] = r;
     rental_count++;
 
-    // Update vehicle availability
     vehicles[v_index].available = 0;
 
     printf("Rental created successfully! Total Cost: %d\n", r.total_cost);
 }
 
-// Return Vehicle
+
 void return_vehicle() {
     int rental_id, v_index;
     printf("Enter Rental ID: ");
