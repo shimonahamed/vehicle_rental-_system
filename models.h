@@ -1,14 +1,21 @@
 #ifndef MODELS_H
 #define MODELS_H
 
+// User Information
+struct user
+{
+    char username[50];
+    char password[50];
+};
+
 // Vehicle Information
 struct vehicle
 {
     int id;
     char name[50];
-    char type[20];    
+    char type[20];
     int price_per_day;
-    int available;    
+    int available;
 };
 
 // Customer Information
@@ -35,7 +42,7 @@ struct payment
     int id;
     int rental_id;
     int amount;
-    char status[20];  // paid / due
+    char status[20]; // paid / due
 };
 
 #endif
