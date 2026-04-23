@@ -6,6 +6,7 @@
 #include "vehicle.h"
 #include "customer.h"
 #include "payment.h"
+#include "date_handler.h"
 
 #define MAX 100
 
@@ -23,11 +24,14 @@ void load_rentals() {
     if (fp == NULL) return;
 
     while (fread(&r, sizeof(r), 1, fp)) {
-        rental_count++;
+
         if (r.id > last_rental_id) {
             last_rental_id = r.id;
         }
+
+        rental_count++;
     }
+
     fclose(fp);
 }
 void create_rental() {
@@ -41,6 +45,7 @@ void create_rental() {
         printf("Rental limit reached!\n");
         return;
     }
+    printf("--- Add New Rental ---\n");
 
     r.id = last_rental_id + 1;
 
@@ -66,8 +71,21 @@ void create_rental() {
     printf("Enter Number of Days: ");
     scanf("%d", &r.days);
 
-    printf("Enter Date (dd-mm-yyyy): ");
-    scanf("%s", r.date);
+        time_t t;
+        time(&t); 
+
+        printf("Rental Date (dd-mm-yyyy): %s\n", current_date);
+
+        strcpy(r.rental_date, current_date);
+        time_t return_time = t + (r.days * 24 * 60 * 60);
+        struct tm *return_tm = localtime(&return_time);
+        char custom_date[20];
+         date_handler(r.days, NULL, custom_date);
+       
+        strcpy(r.return_date, custom_date);
+        printf("Return Date (dd-mm-yyyy): %s\n", r.return_date);
+
+
 
     r.total_cost = r.days * v->price_per_day;
     printf("Total Cost: %d\n", r.total_cost);
@@ -109,10 +127,12 @@ void show_rentals() {
     while (fread(&r, sizeof(r), 1, fp)) {
         printf("ID: %d\n", r.id);
         printf("Customer Name: %s\n", get_customer_name(r.customer_id));
+        printf("Vehicle ID: %d\n", r.vehicle_id);
         printf("Vehicle Name: %s\n", get_vehicle_name(r.vehicle_id));
         printf("Days: %d\n", r.days);
         printf("Total Cost: %d\n", r.total_cost);
-        printf("Date: %s\n", r.date);
+        printf("Rental Date: %s\n", r.rental_date);
+        printf("Return Date: %s\n", r.return_date);
         printf("Status: %s\n", r.status == RENT_ACTIVE ? "Active" : (r.status == RENT_RETURNED ? "Returned" : "Cancelled"));
         printf("-------------------\n");
     }
@@ -145,6 +165,35 @@ void return_vehicle() {
             }
             update_vehicle_status(r.vehicle_id, 1);
             printf("Vehicle returned successfully!\n");
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if (!found) {
+        printf("Rental not found!\n");
+    }
+}
+void cancel_rental() {
+    FILE *fp;
+    struct rental r;
+    int rental_id;
+    int found = 0;
+
+    printf("Enter Rental ID: ");
+    scanf("%d", &rental_id);
+
+    fp = fopen("data/rentals.dat", "rb");
+    if (fp == NULL) {
+        printf("No rentals available!\n");
+        return;
+    }
+    while (fread(&r, sizeof(r), 1, fp)) {
+        if (r.id == rental_id) {
+            update_vehicle_status(r.vehicle_id, 1);
+            printf("Rental cancelled successfully!\n");
             found = 1;
             break;
         }

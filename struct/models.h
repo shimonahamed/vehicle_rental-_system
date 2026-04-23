@@ -3,6 +3,14 @@
 #define RENT_ACTIVE 1
 #define RENT_RETURNED 2
 #define RENT_CANCELLED 3
+#define ADMIN 1
+#define USER 2
+
+int current_role;
+char current_date[20];
+// char custom_date[20];
+int diff_days;
+
 
 // Vehicle Information
 struct users
@@ -12,9 +20,9 @@ struct users
     unsigned long password_hash;
     char phone[15];    
     char email[50];
+    int role;
     int status;    
 };
-// Vehicle Information
 struct vehicle
 {
     int id;
@@ -45,12 +53,13 @@ struct rental
     int days;
     int daily_rate;
     int total_cost;
-    char date[20];
+    char rental_date[20];
+    char return_date[20];
     int status;
 
 };
 
-// Payment Information
+
 enum payment_status {
     UNPAID,
     PARTIAL,
@@ -66,6 +75,7 @@ struct payment
     int payable_amount;
     int paid_amount;
     int due_amount;
+    char payment_date[20];
 
     enum payment_status status;
 };

@@ -33,6 +33,7 @@ void add_vehicle() {
         printf("Vehicle list full!\n");
         return;
     }
+    printf("--- Add New Vehicle ---\n");
 
     v.id = last_vehicle_id + 1;
 

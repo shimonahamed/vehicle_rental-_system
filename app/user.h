@@ -28,7 +28,9 @@ void lastUserId() {
         return;
     }
     while (fread(&u, sizeof(u), 1, fp)) {
-        last_user_id = u.id;
+      if (u.id > last_user_id) {
+            last_user_id = u.id; // 🔥 max id track
+        }
         user_count++;
     }
     fclose(fp);
@@ -43,8 +45,14 @@ void add_user() {
         printf("User list full!\n");
         return;
     }
+    if (current_role==ADMIN)
+    {
+    printf("--- Add New User ---\n");
+    } else {
+        printf("--- Registration ---\n");
+    }
+    
     u.id = last_user_id + 1;
-
     printf("Enter User Name: ");
     scanf(" %[^\n]", u.name);
 
@@ -58,6 +66,17 @@ void add_user() {
     printf("Enter User Email: ");
     scanf("%s", u.email);
     u.status = 1;
+      if (current_role == ADMIN) {
+        printf("Enter Role (1=Admin, 2=User): ");
+        scanf("%d", &u.role);
+        if (u.role != 1 && u.role != 2) {
+            printf("Invalid role! Defaulting to USER.\n");
+            u.role = USER;
+        }
+    } else {
+        u.role = USER;
+    }
+
     fp = fopen("data/users.dat", "ab");
     if (fp == NULL) {
         printf("File error!\n");
@@ -87,6 +106,8 @@ void show_users() {
         printf("Name: %s\n", u.name);
         printf("Phone: %s\n", u.phone);
         printf("Email: %s\n", u.email);
+        printf("Role: %s\n", u.role == ADMIN ? "Admin" : "User");
+
         printf("Status: %s\n", u.status ? "Active" : "Inactive");
         printf("-------------------\n");
     }
@@ -154,7 +175,15 @@ int login() {
                 fclose(fp);
                 return 0;
             }
+           
+            current_role = u.role;
+
             printf("Login successful!\n");
+
+            if(current_role == ADMIN)
+                printf("Logged in as ADMIN\n");
+            else
+                printf("Logged in as USER\n");
             fclose(fp);
             return 1;
         }

@@ -35,6 +35,8 @@ void add_customer() {
         printf("Customer list full!\n");
         return;
     }
+    printf("--- Add New Customer ---\n");
+
     c.id = last_customer_id + 1;
 
     printf("Enter Customer Name: ");
