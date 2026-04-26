@@ -7,7 +7,10 @@
 #define USER 2
 
 int current_role;
+int user_id;
 char current_date[20];
+char current_time[20];
+
 // char custom_date[20];
 int diff_days;
 
@@ -29,7 +32,9 @@ struct vehicle
     char name[50];
     char type[20];    
     int price_per_day;   
-    int available;    
+    int available;  
+    int user_id[10];  
+    char created_at[20];  
     int status; 
 };
 
@@ -41,6 +46,7 @@ struct customer
     char phone[20];
     char email[50];
     char address[150];
+    int user_id[10];    
     int status; 
 };
 
@@ -55,6 +61,8 @@ struct rental
     int total_cost;
     char rental_date[20];
     char return_date[20];
+    int user_id[10];    
+    char created_at[20];
     int status;
 
 };
@@ -76,7 +84,7 @@ struct payment
     int paid_amount;
     int due_amount;
     char payment_date[20];
-
+    int user_id[10];    
     enum payment_status status;
 };
 

@@ -29,7 +29,7 @@ void lastUserId() {
     }
     while (fread(&u, sizeof(u), 1, fp)) {
       if (u.id > last_user_id) {
-            last_user_id = u.id; // 🔥 max id track
+            last_user_id = u.id;
         }
         user_count++;
     }
@@ -177,7 +177,7 @@ int login() {
             }
            
             current_role = u.role;
-
+            user_id = u.id;
             printf("Login successful!\n");
 
             if(current_role == ADMIN)
@@ -229,6 +229,23 @@ void change_password() {
         printf("Password changed successfully!\n");
     else
         printf("User not found!\n");
+}
+char* get_user_name(int id) {
+    FILE *fp;
+    static struct users u;
+
+    fp = fopen("data/users.dat", "rb");
+    if (fp == NULL) return "Unknown";
+
+    while (fread(&u, sizeof(u), 1, fp)) {
+        if (u.id == id) {
+            fclose(fp);
+            return u.name;
+        }
+    }
+
+    fclose(fp);
+    return "Unknown";
 }
 
 #endif

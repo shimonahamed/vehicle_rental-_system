@@ -19,16 +19,12 @@ void load_rentals() {
 
     rental_count = 0;
     last_rental_id = 0;
-
     fp = fopen("data/rentals.dat", "rb");
     if (fp == NULL) return;
-
     while (fread(&r, sizeof(r), 1, fp)) {
-
         if (r.id > last_rental_id) {
             last_rental_id = r.id;
         }
-
         rental_count++;
     }
 
@@ -76,6 +72,7 @@ void create_rental() {
 
         printf("Rental Date (dd-mm-yyyy): %s\n", current_date);
 
+        strcpy(r.created_at, current_time);
         strcpy(r.rental_date, current_date);
         time_t return_time = t + (r.days * 24 * 60 * 60);
         struct tm *return_tm = localtime(&return_time);
@@ -85,8 +82,6 @@ void create_rental() {
         strcpy(r.return_date, custom_date);
         printf("Return Date (dd-mm-yyyy): %s\n", r.return_date);
 
-
-
     r.total_cost = r.days * v->price_per_day;
     printf("Total Cost: %d\n", r.total_cost);
     int payment_amount;
@@ -94,7 +89,7 @@ void create_rental() {
     scanf("%d", &payment_amount);
 
     r.status = RENT_ACTIVE;
-
+    r.user_id[0] = user_id;
 
     fp = fopen("data/rentals.dat", "ab");
     if (fp == NULL) {
@@ -103,6 +98,7 @@ void create_rental() {
     }
     fwrite(&r, sizeof(r), 1, fp);
     fclose(fp);
+        last_rental_id = r.id;   
     if (payment_amount > 0)
     {
        payment(r, payment_amount);
@@ -110,7 +106,7 @@ void create_rental() {
     
     update_vehicle_status(r.vehicle_id, 0); 
     int due_amount = r.total_cost - payment_amount;
-    printf("Rental created! ID: %d Total: %d\n", r.id, due_amount);
+    printf("Rental created! ID: %d Total Due: %d\n", r.id, due_amount);
 }
 void show_rentals() {
     FILE *fp;
@@ -125,6 +121,7 @@ void show_rentals() {
     printf("--- Total Rentals: %d ---\n", rental_count);
 
     while (fread(&r, sizeof(r), 1, fp)) {
+        if (current_role == USER ? r.user_id == user_id : 1){
         printf("ID: %d\n", r.id);
         printf("Customer Name: %s\n", get_customer_name(r.customer_id));
         printf("Vehicle ID: %d\n", r.vehicle_id);
@@ -134,7 +131,9 @@ void show_rentals() {
         printf("Rental Date: %s\n", r.rental_date);
         printf("Return Date: %s\n", r.return_date);
         printf("Status: %s\n", r.status == RENT_ACTIVE ? "Active" : (r.status == RENT_RETURNED ? "Returned" : "Cancelled"));
+        printf("User Name: %s\n", get_user_name(r.user_id));
         printf("-------------------\n");
+        }
     }
 
     fclose(fp);
@@ -179,11 +178,13 @@ void return_vehicle() {
 void cancel_rental() {
     FILE *fp;
     struct rental r;
-    int rental_id;
+    int rental_id,vehicle_id;
     int found = 0;
 
     printf("Enter Rental ID: ");
     scanf("%d", &rental_id);
+    printf("Enter Vehicle ID: ");
+    scanf("%d", &vehicle_id);
 
     fp = fopen("data/rentals.dat", "rb");
     if (fp == NULL) {
@@ -191,7 +192,12 @@ void cancel_rental() {
         return;
     }
     while (fread(&r, sizeof(r), 1, fp)) {
-        if (r.id == rental_id) {
+        if (r.id == rental_id && r.vehicle_id == vehicle_id) {
+            if (current_date)
+            {
+                /* code */
+            }
+            
             update_vehicle_status(r.vehicle_id, 1);
             printf("Rental cancelled successfully!\n");
             found = 1;

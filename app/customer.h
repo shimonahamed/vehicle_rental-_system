@@ -20,10 +20,11 @@ void lastCustomerId() {
         return;
     }
     while (fread(&c, sizeof(c), 1, fp)) {
-        customer_count++;
-           if (c.id > last_customer_id) {
+        if (c.id > last_customer_id) {
             last_customer_id = c.id;
         }
+        customer_count++;
+
     }
     fclose(fp);
 }
@@ -48,6 +49,7 @@ void add_customer() {
     printf("Enter Customer Address: ");
     scanf(" %[^\n]", c.address);
     c.status = 1;
+    c.user_id[0] = user_id;
     fp = fopen("data/customers.dat", "ab");
     if (fp == NULL) {
         printf("Error adding customer!\n");
@@ -55,6 +57,8 @@ void add_customer() {
     }
     fwrite(&c, sizeof(c), 1, fp);
     fclose(fp);
+    last_customer_id = c.id;   
+    customer_count++; 
     printf("Customer added successfully!______ID: %d\n", c.id);
 }
 
@@ -69,13 +73,16 @@ void show_customers() {
     printf("\n--- Customer List ---\n");
     printf("--- Total Customers: %d ---\n", customer_count);
     while (fread(&c, sizeof(c), 1, fp)) {
-        printf("ID: %d\n", c.id);
-        printf("Name: %s\n", c.name);
-        printf("Phone: %s\n", c.phone);
-        printf("Email: %s\n", c.email);
-        printf("Address: %s\n", c.address);
-        printf("Status: %s\n", c.status ? "Active" : "Inactive");
-        printf("-------------------\n");
+        if (current_role == USER ? c.user_id == user_id : 1){
+            printf("ID: %d\n", c.id);
+            printf("Name: %s\n", c.name);
+            printf("Phone: %s\n", c.phone);
+            printf("Email: %s\n", c.email);
+            printf("Address: %s\n", c.address);
+            printf("Status: %s\n", c.status ? "Active" : "Inactive");
+            printf("User Name: %s\n", get_user_name(c.user_id));
+            printf("-------------------\n");
+        }
     }
     fclose(fp);
 }

@@ -18,7 +18,10 @@ void loadPayment(){
     if (fp == NULL) return;
 
     while (fread(&p, sizeof(p), 1, fp)) {
-        last_payment_id = p.id;
+        if (p.id > last_payment_id) {
+            last_payment_id = p.id;
+        }
+        
     }
     fclose(fp);
 }
@@ -46,6 +49,7 @@ void payment(struct rental r, int payment_amount) {
         if (pfp != NULL) {
             fwrite(&p, sizeof(p), 1, pfp);
             fclose(pfp);
+            last_payment_id = p.id;  
         }
 }
 int get_total_paid(int rental_id) {
@@ -57,8 +61,8 @@ int get_total_paid(int rental_id) {
     if (fp == NULL) return 0;
 
     while (fread(&p, sizeof(p), 1, fp)) {
-        if (p.rental_id == rental_id) {   // ✅ correct condition
-            total_paid += p.paid_amount;  // ✅ sum
+        if (p.rental_id == rental_id) {   
+            total_paid += p.paid_amount;  
         }
     }
 
@@ -116,6 +120,8 @@ void create_payment() {
     p.total_amount = r->total_cost;
     p.payable_amount = r->total_cost;
     p.due_amount = p.payable_amount - p.paid_amount;
+    strcpy(p.payment_date, current_date);
+    p.user_id[0] = user_id;
 
     if (p.due_amount == 0) {
         p.status = PAID;
@@ -134,7 +140,7 @@ void create_payment() {
     fwrite(&p, sizeof(p), 1, fp);
     fclose(fp);
 
-    last_payment_id = p.id;   // ✅ update ID
+    last_payment_id = p.id;  
 
     printf("Payment saved! ID: %d\n", p.id);
 }
@@ -149,6 +155,7 @@ void show_payments() {
     }
     printf("\n--- Payment List ---\n");
     while (fread(&p, sizeof(p), 1, fp)) {
+    if (current_role == USER ? p.user_id == user_id : 1){
         printf(" ID: %d\n", p.id);
         printf("Rental ID: %d\n", p.rental_id);
         printf("Customer ID: %d\n", p.customer_id);
@@ -157,7 +164,9 @@ void show_payments() {
         printf("Paid Amount: %d\n", p.paid_amount);
         printf("Due Amount: %d\n", p.due_amount);
         printf("Status: %s\n", p.status == PAID ? "PAID" : (p.status == PARTIAL ? "PARTIAL" : "UNPAID"));
+        printf("User Name: %s\n", get_user_name(p.user_id));
         printf("-------------------\n");
+    }
     }
     fclose(fp);
 }

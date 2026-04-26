@@ -12,15 +12,16 @@ int last_vehicle_id = 0;
 void lastVehicleId() {
     FILE *fp;
     struct vehicle v;
-
-    last_vehicle_id = 0;
-    vehicle_count = 0;
+    vehicle_count = 0;     
+    last_vehicle_id = 0;  
 
     fp = fopen("data/vehicles.dat", "rb");
     if (fp == NULL) return;
 
     while (fread(&v, sizeof(v), 1, fp)) {
-        last_vehicle_id = v.id;
+          if (v.id > last_vehicle_id) {
+                last_vehicle_id = v.id;
+          }
         vehicle_count++;
     }
 
@@ -48,6 +49,8 @@ void add_vehicle() {
 
     v.available = 1;
     v.status = 1;
+    v.user_id[0] = user_id;
+    strcpy(v.created_at, current_date);
 
     fp = fopen("data/vehicles.dat", "ab");
     if (fp == NULL) {
@@ -57,6 +60,8 @@ void add_vehicle() {
 
     fwrite(&v, sizeof(v), 1, fp);
     fclose(fp);
+    last_vehicle_id = v.id;  
+    vehicle_count++; 
 
     printf("Vehicle added successfully! ID: %d\n", v.id);
 }
@@ -73,13 +78,17 @@ void show_vehicles() {
     printf("\n--- Vehicle List ---\n");
     printf("--- Total Vehicles: %d ---\n", vehicle_count);
     while (fread(&v,sizeof(v),1,fp)) {
-        printf("ID: %d\n", v.id);
-        printf("Name: %s\n", v.name);
-        printf("Type: %s\n", v.type);
-        printf("Price per Day: %d\n", v.price_per_day);
-        printf("Available Status: %s\n", v.available ? "Available" : "Rented");
-        printf("Status: %s\n", v.status ? "Active" : "Inactive");
-        printf("-------------------\n");
+        if (current_role == USER ? v.user_id == user_id : 1){
+            printf("ID: %d\n", v.id);
+            printf("Name: %s\n", v.name);
+            printf("Type: %s\n", v.type);
+            printf("Price per Day: %d\n", v.price_per_day);
+            printf("Available Status: %s\n", v.available ? "Available" : "Rented");
+            printf("Status: %s\n", v.status ? "Active" : "Inactive");
+            printf("User Name: %s\n", get_user_name(v.user_id));
+            printf("Created At: %s\n", v.created_at);
+            printf("-------------------\n");
+        }
 
     }
     fclose(fp);
