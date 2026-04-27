@@ -23,7 +23,10 @@ void lastCustomerId() {
         if (c.id > last_customer_id) {
             last_customer_id = c.id;
         }
-        customer_count++;
+        if (current_role == ADMIN || c.user_id == user_id ){
+            customer_count++;
+          
+        }
 
     }
     fclose(fp);
@@ -49,7 +52,7 @@ void add_customer() {
     printf("Enter Customer Address: ");
     scanf(" %[^\n]", c.address);
     c.status = 1;
-    c.user_id[0] = user_id;
+    c.user_id = user_id;
     fp = fopen("data/customers.dat", "ab");
     if (fp == NULL) {
         printf("Error adding customer!\n");
@@ -97,12 +100,14 @@ int find_customer(int id) {
     }
 
     while (fread(&c, sizeof(c), 1, fp)) {
-        if (c.id == id) {
+        int allowed = (current_role == ADMIN || c.user_id == user_id);
+
+        if (allowed && c.id == id) {
             fclose(fp);
             return 1;  
         }
-    }
 
+    }
     fclose(fp);
     return -1; 
 }

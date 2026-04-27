@@ -7,6 +7,7 @@
 #include "customer.h"
 #include "payment.h"
 #include "date_handler.h"
+#include "user.h"
 
 #define MAX 100
 
@@ -25,7 +26,9 @@ void load_rentals() {
         if (r.id > last_rental_id) {
             last_rental_id = r.id;
         }
-        rental_count++;
+        if (current_role == ADMIN || r.user_id == user_id ){
+            rental_count++;
+        }
     }
 
     fclose(fp);
@@ -89,7 +92,7 @@ void create_rental() {
     scanf("%d", &payment_amount);
 
     r.status = RENT_ACTIVE;
-    r.user_id[0] = user_id;
+    r.user_id = user_id;
 
     fp = fopen("data/rentals.dat", "ab");
     if (fp == NULL) {
@@ -121,7 +124,7 @@ void show_rentals() {
     printf("--- Total Rentals: %d ---\n", rental_count);
 
     while (fread(&r, sizeof(r), 1, fp)) {
-        if (current_role == USER ? r.user_id == user_id : 1){
+        if (current_role == ADMIN || r.user_id == user_id ){
         printf("ID: %d\n", r.id);
         printf("Customer Name: %s\n", get_customer_name(r.customer_id));
         printf("Vehicle ID: %d\n", r.vehicle_id);
@@ -130,6 +133,7 @@ void show_rentals() {
         printf("Total Cost: %d\n", r.total_cost);
         printf("Rental Date: %s\n", r.rental_date);
         printf("Return Date: %s\n", r.return_date);
+        printf("Create Time: %s\n", r.created_at);
         printf("Status: %s\n", r.status == RENT_ACTIVE ? "Active" : (r.status == RENT_RETURNED ? "Returned" : "Cancelled"));
         printf("User Name: %s\n", get_user_name(r.user_id));
         printf("-------------------\n");
@@ -155,7 +159,8 @@ void return_vehicle() {
         return;
     }
     while (fread(&r, sizeof(r), 1, fp)) {
-        if (r.id == rental_id) {
+        int allowed = (current_role == ADMIN || r.user_id == user_id);
+        if (allowed && r.id == rental_id) {
             int paid = get_total_paid(rental_id);
             if (paid < r.total_cost) {
                 printf("Payment pending! Please clear dues before returning.Total Due: %d\n", r.total_cost - paid);
@@ -192,13 +197,23 @@ void cancel_rental() {
         return;
     }
     while (fread(&r, sizeof(r), 1, fp)) {
-        if (r.id == rental_id && r.vehicle_id == vehicle_id) {
-            if (current_date)
-            {
-                /* code */
-            }
+        int allowed = (current_role == ADMIN || r.user_id == user_id);
+        if (allowed && r.id == rental_id && r.vehicle_id == vehicle_id) {
+            printf("%s",current_time);
+            time_t diff = current_time - r.created_at;
+            if (diff < 0) {
+    diff = 0; // safety fix
+}
+
+double hours = diff / 3600.0;
+
+printf("Hours passed: %.2f\n", hours);
+            // if (current_date)
+            // {
+            //     /* code */
+            // }
             
-            update_vehicle_status(r.vehicle_id, 1);
+            // update_vehicle_status(r.vehicle_id, 1);
             printf("Rental cancelled successfully!\n");
             found = 1;
             break;

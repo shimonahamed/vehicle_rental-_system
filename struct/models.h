@@ -33,7 +33,7 @@ struct vehicle
     char type[20];    
     int price_per_day;   
     int available;  
-    int user_id[10];  
+    int user_id;  
     char created_at[20];  
     int status; 
 };
@@ -46,7 +46,7 @@ struct customer
     char phone[20];
     char email[50];
     char address[150];
-    int user_id[10];    
+    int user_id;    
     int status; 
 };
 
@@ -61,7 +61,7 @@ struct rental
     int total_cost;
     char rental_date[20];
     char return_date[20];
-    int user_id[10];    
+    int user_id;    
     char created_at[20];
     int status;
 
@@ -84,7 +84,7 @@ struct payment
     int paid_amount;
     int due_amount;
     char payment_date[20];
-    int user_id[10];    
+    int user_id;    
     enum payment_status status;
 };
 

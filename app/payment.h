@@ -34,6 +34,7 @@ void payment(struct rental r, int payment_amount) {
         p.vehicle_id = r.vehicle_id;
         p.total_amount = r.total_cost;
         p.payable_amount = r.total_cost;
+        p.user_id = user_id;
         p.paid_amount = payment_amount;
         p.due_amount = r.total_cost - payment_amount;
 
@@ -61,7 +62,8 @@ int get_total_paid(int rental_id) {
     if (fp == NULL) return 0;
 
     while (fread(&p, sizeof(p), 1, fp)) {
-        if (p.rental_id == rental_id) {   
+        int allowed = (current_role == ADMIN || p.user_id == user_id);
+        if (allowed && p.rental_id == rental_id) {   
             total_paid += p.paid_amount;  
         }
     }
@@ -77,7 +79,8 @@ struct rental* find_rental(int id) {
     if (fp == NULL) return NULL;
 
     while (fread(&r, sizeof(r), 1, fp)) {
-        if (r.id == id) {
+        int allowed = (current_role == ADMIN || r.user_id == user_id);
+        if (allowed && r.id == id) {
             fclose(fp);
             return &r;
         }
@@ -121,7 +124,7 @@ void create_payment() {
     p.payable_amount = r->total_cost;
     p.due_amount = p.payable_amount - p.paid_amount;
     strcpy(p.payment_date, current_date);
-    p.user_id[0] = user_id;
+    p.user_id = user_id;
 
     if (p.due_amount == 0) {
         p.status = PAID;

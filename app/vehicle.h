@@ -49,7 +49,7 @@ void add_vehicle() {
 
     v.available = 1;
     v.status = 1;
-    v.user_id[0] = user_id;
+    v.user_id = user_id;
     strcpy(v.created_at, current_date);
 
     fp = fopen("data/vehicles.dat", "ab");
@@ -61,7 +61,6 @@ void add_vehicle() {
     fwrite(&v, sizeof(v), 1, fp);
     fclose(fp);
     last_vehicle_id = v.id;  
-    vehicle_count++; 
 
     printf("Vehicle added successfully! ID: %d\n", v.id);
 }
@@ -102,7 +101,8 @@ struct vehicle* find_vehicle(int id) {
     if (fp == NULL) return NULL;
 
     while (fread(&v, sizeof(v), 1, fp)) {
-        if (v.id == id) {
+        int allowed = (current_role == ADMIN || v.user_id == user_id);
+        if (allowed && v.id == id) {
             fclose(fp);
             return &v;
         }
@@ -126,8 +126,7 @@ void update_vehicle_status(int id, int status) {
     }
 
     while (fread(&v, sizeof(v), 1, fp)) {
-
-        if (v.id == id) {
+        if (v.id == id && v.user_id == user_id) {
             v.available = status;
             found = 1;
         }
