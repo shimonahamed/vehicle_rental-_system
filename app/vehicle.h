@@ -75,7 +75,7 @@ void show_vehicles() {
         return;
     }
     printf("\n--- Vehicle List ---\n");
-    printf("--- Total Vehicles: %d ---\n", vehicle_count);
+    // printf("--- Total Vehicles: %d ---\n", vehicle_count);
     while (fread(&v,sizeof(v),1,fp)) {
         if (current_role == USER ? v.user_id == user_id : 1){
             printf("ID: %d\n", v.id);

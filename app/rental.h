@@ -121,7 +121,7 @@ void show_rentals() {
         return;
     }
     printf("\n--- Rental List ---\n");
-    printf("--- Total Rentals: %d ---\n", rental_count);
+    // printf("--- Total Rentals: %d ---\n", rental_count);
 
     while (fread(&r, sizeof(r), 1, fp)) {
         if (current_role == ADMIN || r.user_id == user_id ){
@@ -147,11 +147,13 @@ void show_rentals() {
 void return_vehicle() {
     FILE *fp;
     struct rental r;
-    int rental_id;
+    int rental_id ,vehicle_id;
     int found = 0;
 
     printf("Enter Rental ID: ");
     scanf("%d", &rental_id);
+    printf("Enter Vehicle ID: ");
+    scanf("%d", &vehicle_id);
 
     fp = fopen("data/rentals.dat", "rb");
     if (fp == NULL) {
@@ -160,7 +162,7 @@ void return_vehicle() {
     }
     while (fread(&r, sizeof(r), 1, fp)) {
         int allowed = (current_role == ADMIN || r.user_id == user_id);
-        if (allowed && r.id == rental_id) {
+        if (allowed && r.id == rental_id && r.vehicle_id == vehicle_id) {
             int paid = get_total_paid(rental_id);
             if (paid < r.total_cost) {
                 printf("Payment pending! Please clear dues before returning.Total Due: %d\n", r.total_cost - paid);
@@ -180,10 +182,11 @@ void return_vehicle() {
         printf("Rental not found!\n");
     }
 }
+
 void cancel_rental() {
-    FILE *fp;
+    FILE *fp, *temp;
     struct rental r;
-    int rental_id,vehicle_id;
+    int rental_id, vehicle_id;
     int found = 0;
 
     printf("Enter Rental ID: ");
@@ -191,39 +194,57 @@ void cancel_rental() {
     printf("Enter Vehicle ID: ");
     scanf("%d", &vehicle_id);
 
-    fp = fopen("data/rentals.dat", "rb");
-    if (fp == NULL) {
-        printf("No rentals available!\n");
+     fp = fopen("data/rentals.dat", "rb");
+    temp = fopen("data/temp.dat", "wb");
+
+    if (!fp || !temp) {
+        printf("File error!\n");
         return;
     }
+
     while (fread(&r, sizeof(r), 1, fp)) {
+
+        int is_target = (r.id == rental_id && r.vehicle_id == vehicle_id);
         int allowed = (current_role == ADMIN || r.user_id == user_id);
-        if (allowed && r.id == rental_id && r.vehicle_id == vehicle_id) {
-            printf("%s",current_time);
-            time_t diff = current_time - r.created_at;
-            if (diff < 0) {
-    diff = 0; // safety fix
-}
 
-double hours = diff / 3600.0;
+        if (is_target && allowed) {
 
-printf("Hours passed: %.2f\n", hours);
-            // if (current_date)
-            // {
-            //     /* code */
-            // }
-            
-            // update_vehicle_status(r.vehicle_id, 1);
-            printf("Rental cancelled successfully!\n");
-            found = 1;
-            break;
+            int h1, m1, s1;
+            int h2, m2, s2;
+
+            sscanf(r.created_at, "%d:%d:%d", &h1, &m1, &s1);
+            sscanf(current_time, "%d:%d:%d", &h2, &m2, &s2);
+
+            int t1 = h1 * 3600 + m1 * 60 + s1;
+            int t2 = h2 * 3600 + m2 * 60 + s2;
+
+            if (t2 < t1) {
+                t2 += 24 * 3600;
+            }
+
+            double diff_hours = (t2 - t1) / 3600.0;
+            if (diff_hours > 6) {
+                printf("Cancellation period expired!\n");
+            } else {
+                r.status = RENT_CANCELLED;
+                found = 1;
+            }
         }
+         fwrite(&r, sizeof(r), 1, temp);
     }
 
     fclose(fp);
+    fclose(temp);
 
+    remove("data/rentals.dat");
+    rename("data/temp.dat", "data/rentals.dat");
     if (!found) {
         printf("Rental not found!\n");
+    }else if (found) {
+                 update_vehicle_status(r.vehicle_id, 1);
+                printf("Rental cancelled successfully!\n");
     }
 }
+
+
 #endif

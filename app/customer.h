@@ -74,7 +74,7 @@ void show_customers() {
         return;
     }
     printf("\n--- Customer List ---\n");
-    printf("--- Total Customers: %d ---\n", customer_count);
+    // printf("--- Total Customers: %d ---\n", customer_count);
     while (fread(&c, sizeof(c), 1, fp)) {
         if (current_role == USER ? c.user_id == user_id : 1){
             printf("ID: %d\n", c.id);
