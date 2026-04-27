@@ -98,19 +98,27 @@ void show_users() {
         printf("No users available!\n");
         return;
     }
-    printf("\n--- User List ---\n");
-    printf("--- Total Users: %d ---\n", user_count);
+
+    printf("\n================== USER LIST ==================\n");
+
+    printf("%-5s %-20s %-15s %-25s %-10s %-10s\n",
+           "ID", "Name", "Phone", "Email", "Role", "Status");
+
+    printf("------------------------------------------------------------------------------------------\n");
 
     while (fread(&u, sizeof(u), 1, fp)) {
-        printf("ID: %d\n", u.id);
-        printf("Name: %s\n", u.name);
-        printf("Phone: %s\n", u.phone);
-        printf("Email: %s\n", u.email);
-        printf("Role: %s\n", u.role == ADMIN ? "Admin" : "User");
 
-        printf("Status: %s\n", u.status ? "Active" : "Inactive");
-        printf("-------------------\n");
+        printf("%-5d %-20s %-15s %-25s %-10s %-10s\n",
+               u.id,
+               u.name,
+               u.phone,
+               u.email,
+               (u.role == ADMIN) ? "Admin" : "User",
+               u.status ? "Active" : "Inactive"
+        );
     }
+
+    printf("====================================================\n");
 
     fclose(fp);
 }

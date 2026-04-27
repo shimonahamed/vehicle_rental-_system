@@ -69,27 +69,38 @@ void show_vehicles() {
 
     FILE *fp;
     struct vehicle v;
+
     fp = fopen("data/vehicles.dat", "rb");
     if (fp == NULL) {
         printf("No vehicles available!\n");
         return;
     }
-    printf("\n--- Vehicle List ---\n");
-    // printf("--- Total Vehicles: %d ---\n", vehicle_count);
-    while (fread(&v,sizeof(v),1,fp)) {
-        if (current_role == USER ? v.user_id == user_id : 1){
-            printf("ID: %d\n", v.id);
-            printf("Name: %s\n", v.name);
-            printf("Type: %s\n", v.type);
-            printf("Price per Day: %d\n", v.price_per_day);
-            printf("Available Status: %s\n", v.available ? "Available" : "Rented");
-            printf("Status: %s\n", v.status ? "Active" : "Inactive");
-            printf("User Name: %s\n", get_user_name(v.user_id));
-            printf("Created At: %s\n", v.created_at);
-            printf("-------------------\n");
-        }
 
+    printf("\n================== VEHICLE LIST ==================\n");
+
+    printf("%-5s %-20s %-10s %-10s %-12s %-10s %-10s\n",
+           "ID", "Name", "Type", "Price", "Available", "Status", "User");
+
+    printf("------------------------------------------------------------------------------------\n");
+
+    while (fread(&v, sizeof(v), 1, fp)) {
+
+        if (current_role == USER ? v.user_id == user_id : 1) {
+
+            printf("%-5d %-20s %-10s %-10d %-12s %-10s %-10s\n",
+                   v.id,
+                   v.name,
+                   v.type,
+                   v.price_per_day,
+                   v.available ? "Yes" : "No",
+                   v.status ? "Active" : "Inactive",
+                   get_user_name(v.user_id)
+            );
+        }
     }
+
+    printf("====================================================\n");
+
     fclose(fp);
 }
 

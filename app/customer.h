@@ -68,25 +68,40 @@ void add_customer() {
 void show_customers() {
     FILE *fp;
     struct customer c;
+
     fp = fopen("data/customers.dat", "rb");
     if (fp == NULL) {
         printf("No customers available!\n");
         return;
     }
-    printf("\n--- Customer List ---\n");
-    // printf("--- Total Customers: %d ---\n", customer_count);
+
+    printf("\n================== CUSTOMER LIST ==================\n");
+
+    printf("%-5s %-20s %-15s %-25s %-20s %-10s %-15s\n",
+           "ID", "Name", "Phone", "Email", "Address", "Status","User");
+
+    printf("------------------------------------------------------------------------------------------\n");
+
     while (fread(&c, sizeof(c), 1, fp)) {
-        if (current_role == USER ? c.user_id == user_id : 1){
-            printf("ID: %d\n", c.id);
-            printf("Name: %s\n", c.name);
-            printf("Phone: %s\n", c.phone);
-            printf("Email: %s\n", c.email);
-            printf("Address: %s\n", c.address);
-            printf("Status: %s\n", c.status ? "Active" : "Inactive");
-            printf("User Name: %s\n", get_user_name(c.user_id));
-            printf("-------------------\n");
+
+        if (current_role == USER ? c.user_id == user_id : 1) {
+
+            printf("%-5d %-20s %-15s %-25s %-20s %-10s %-15s\n",
+                   c.id,
+                   c.name,
+                   c.phone,
+                   c.email,
+                   c.address,
+                   c.status ? "Active" : "Inactive",
+                    get_user_name(c.user_id)
+
+
+            );
         }
     }
+
+    printf("====================================================\n");
+
     fclose(fp);
 }
 

@@ -82,7 +82,7 @@ int main() {
                     }
 
                     printf("Enter your choice: ");
-                    scanf("%d", &menu_choice);   // ✅ separate variable
+                    scanf("%d", &menu_choice);   
 
                     if (current_role == USER) {
                         switch (menu_choice) {

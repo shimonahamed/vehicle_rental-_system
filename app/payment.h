@@ -151,29 +151,43 @@ void create_payment() {
 void show_payments() {
     FILE *fp;
     struct payment p;
+
     fp = fopen("data/payments.dat", "rb");
     if (fp == NULL) {
         printf("No payments available!\n");
         return;
     }
-    printf("\n--- Payment List ---\n");
+
+    printf("\n================== PAYMENT LIST ==================\n");
+
+    printf("%-5s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s\n",
+           "ID", "RentID", "CustID", "VehID", "Payable", "Paid", "Due", "Status", "User");
+
+    printf("---------------------------------------------------------------------------------------------------------------\n");
+
     while (fread(&p, sizeof(p), 1, fp)) {
-    if (current_role == USER ? p.user_id == user_id : 1){
-        printf(" ID: %d\n", p.id);
-        printf("Rental ID: %d\n", p.rental_id);
-        printf("Customer ID: %d\n", p.customer_id);
-        printf("Vehicle ID: %d\n", p.vehicle_id);
-        printf("Payable Amount: %d\n", p.payable_amount);
-        printf("Paid Amount: %d\n", p.paid_amount);
-        printf("Due Amount: %d\n", p.due_amount);
-        printf("Status: %s\n", p.status == PAID ? "PAID" : (p.status == PARTIAL ? "PARTIAL" : "UNPAID"));
-        printf("User Name: %s\n", get_user_name(p.user_id));
-        printf("-------------------\n");
+
+        if (current_role == USER ? p.user_id == user_id : 1) {
+
+            printf("%-5d %-10d %-10d %-10d %-10d %-10d %-10d %-10s %-10s\n",
+                   p.id,
+                   p.rental_id,
+                   p.customer_id,
+                   p.vehicle_id,
+                   p.payable_amount,
+                   p.paid_amount,
+                   p.due_amount,
+                   (p.status == PAID) ? "PAID" :
+                   (p.status == PARTIAL) ? "PARTIAL" : "UNPAID",
+                   get_user_name(p.user_id)
+            );
+        }
     }
-    }
+
+    printf("====================================================\n");
+
     fclose(fp);
 }
-
 void payment_details() {
     FILE *fp;
     struct rental r;

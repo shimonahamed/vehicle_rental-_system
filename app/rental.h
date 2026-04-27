@@ -120,25 +120,35 @@ void show_rentals() {
         printf("No rentals available!\n");
         return;
     }
-    printf("\n--- Rental List ---\n");
-    // printf("--- Total Rentals: %d ---\n", rental_count);
+    printf("\n================== RENTAL LIST ==================\n");
 
-    while (fread(&r, sizeof(r), 1, fp)) {
-        if (current_role == ADMIN || r.user_id == user_id ){
-        printf("ID: %d\n", r.id);
-        printf("Customer Name: %s\n", get_customer_name(r.customer_id));
-        printf("Vehicle ID: %d\n", r.vehicle_id);
-        printf("Vehicle Name: %s\n", get_vehicle_name(r.vehicle_id));
-        printf("Days: %d\n", r.days);
-        printf("Total Cost: %d\n", r.total_cost);
-        printf("Rental Date: %s\n", r.rental_date);
-        printf("Return Date: %s\n", r.return_date);
-        printf("Create Time: %s\n", r.created_at);
-        printf("Status: %s\n", r.status == RENT_ACTIVE ? "Active" : (r.status == RENT_RETURNED ? "Returned" : "Cancelled"));
-        printf("User Name: %s\n", get_user_name(r.user_id));
-        printf("-------------------\n");
+printf("%-5s %-15s %-8s %-15s %-5s %-10s %-10s %-12s %-12s %-12s\n",
+       "ID", "Customer", "VehID", "Vehicle", "Days",
+       "Cost", "Status", "Rental Date", "Return Date", "User");
+
+        printf("---------------------------------------------------------------------------------------------------------------\n");
+
+        while (fread(&r, sizeof(r), 1, fp)) {
+
+            if (current_role == ADMIN || r.user_id == user_id) {
+
+                printf("%-5d %-15s %-8d %-15s %-5d %-10d %-10s %-12s %-12s %-12s\n",
+                    r.id,
+                    get_customer_name(r.customer_id),
+                    r.vehicle_id,
+                    get_vehicle_name(r.vehicle_id),
+                    r.days,
+                    r.total_cost,
+                    (r.status == RENT_ACTIVE) ? "Active" :
+                    (r.status == RENT_RETURNED) ? "Returned" : "Cancelled",
+                    r.rental_date,
+                    r.return_date,
+                    get_user_name(r.user_id)
+                );
+            }
         }
-    }
+
+    printf("==============================================================\n");
 
     fclose(fp);
 }
