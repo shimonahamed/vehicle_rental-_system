@@ -7,7 +7,7 @@
 #include "app/user.h"
 #include "app/vehicle.h"
 #include "app/customer.h"
-#include "app/rental.h"
+#include "app/rental.h" 
 #include "app/payment.h"
 #include "app/date_handler.h"
 
